@@ -18,13 +18,22 @@ VK: https://vk.com/xugoo
 email: galliy7rezerford@gmail.com
 
 https://1prime.ru/docs/terms_terms_of_use.html
-© 1996-2024 АО "АЭИ "ПРАЙМ"". Все права защищены.
 """
 
 class PrimeParser:
 
     def __init__(self):
         pass
+    
+    def get_last_news(self, query, period='week'):
+        if period in ['week', 'w']:
+            date_from = dt.datetime.now() - dt.timedelta(days=7)
+        elif period in ['month', 'm']:
+            date_from = dt.datetime.now() - dt.timedelta(days=30)
+        else:
+            date_from = dt.datetime.now() - dt.timedelta(days=1)
+
+        return self.get_news_by_period(query, date_from=date_from)
 
     def get_news_by_period(self, query, date_from, date_to='now', max_pages=1, sortby='relevance'):
 
@@ -42,13 +51,16 @@ class PrimeParser:
 
         for i in range(max_pages):
             offset = f'&offset={20 * i}' if i > 0 else ''
-            req = requests.get('https://1prime.ru/services/search/getmore/'
-                                '?tags_limit=10'
-                                f'&date_from={str(date_from.date())}'
-                                f'&date_to={str(date_to.date())}'
-                                f'&query={query}'
-                                f'{offset}'
-                                '&sort={sortby}')
+            url = \
+                'https://1prime.ru/services/search/getmore/'\
+                + '?tags_limit=10'\
+                + f'&date_from={str(date_from.date())}'\
+                + f'&date_to={str(date_to.date())}'\
+                + f'&query={query}'\
+                + f'{offset}'\
+                + f'&sort={sortby}'
+            
+            req = requests.get(url)
             sleep(0.05)
                 
             content = bs4.BeautifulSoup(req.content, 'html.parser')
@@ -59,7 +71,7 @@ class PrimeParser:
                 
             news.extend(content)
                             
-        return pd.DataFrame(news, columns=['title', 'datetime'])
+        return pd.DataFrame(news, columns=['body', 'publish_date'])
     
     @staticmethod
     def process_news_page(page):

@@ -1,4 +1,5 @@
 import datetime as dt
+import pandas as pd
 
 RUS_MONTHS = [
     'января', 'февраля', 
@@ -44,3 +45,13 @@ def parse_rus_date(s):
     else:
         raise NotImplementedError
     
+    
+def news_df_to_txt(df):
+    assert type(df) == pd.core.frame.DataFrame, 'Wrong data type'
+
+    result = []
+        
+    for i, row in df.iterrows():
+        result.append(f'Новость от {row['publish_date']}: {row.get('title', '')}: {row.get('body', '')}')
+    
+    return '\n'.join(result)
