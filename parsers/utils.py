@@ -52,6 +52,6 @@ def news_df_to_txt(df):
     result = []
         
     for i, row in df.iterrows():
-        result.append(f'Новость от {row['publish_date']}: {row.get('title', '')}: {row.get('body', '')}')
+        result.append(f'Новость от {row['publish_date'].strftime('%d.%m.%Y')}: {row.get('title', '')}: {row.get('body', '')}')
     
     return '\n'.join(result)

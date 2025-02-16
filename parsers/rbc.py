@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 from os import getenv
 
 """
-Допишу дисклеймер
+код в чистом виде работать не будет: умышленно вырезана важная часть
 """
 
 class RBCParser:
