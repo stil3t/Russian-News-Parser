@@ -55,3 +55,13 @@ def news_df_to_txt(df):
         result.append(f'Новость от {row['publish_date'].strftime('%d.%m.%Y')}: {row.get('title', '')}: {row.get('body', '')}')
     
     return '\n'.join(result)
+
+
+def build_query(company, parser):
+    news = parser.get_last_news(company, period='month')
+    news = news_df_to_txt(news)
+    query =\
+    f'Оцени новостной фон для компании {company} и скажи, стоит ли покупать акции этой компании. Твой ответ должен быть меньше 150 слов. Новости:\n'\
+    + news
+
+    return query
