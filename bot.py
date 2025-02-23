@@ -14,7 +14,7 @@ from aiogram.types import Message
 from parsers.prime import PrimeParser
 from parsers.rbc import RBCParser
 
-from parsers.utils import build_query
+from parsers.utils import news_df_to_txt
 
 from gigachat import GigaChat
 
@@ -37,13 +37,23 @@ async def command_start_handler(message: Message) -> None:
 async def echo_handler(message: Message) -> None:
     try:
         parser = PrimeParser()
-        query = build_query(message.text, parser)
+        news = parser.get_last_news(message.text, period='month')
+        
+        if len(news) < 1:
+            await message.answer('За последний месяц новостей не найдено')
 
-        with GigaChat(credentials=GIGIAKEY, verify_ssl_certs=False) as giga:
-            response = giga.chat(query)
-            response = response.choices[0].message.content
+        else:
+            query =\
+            f'Оцени новостной фон для компании {message.text} и скажи,'\
+            ' стоит ли покупать акции этой компании.'\
+            'В твоем ответе не должно быть больше 150 слов. При ответе опирайся на следующие новости:'\
+            + news_df_to_txt(news)
+
+            with GigaChat(credentials=GIGIAKEY, verify_ssl_certs=False) as giga:
+                response = giga.chat(query)
+                response = response.choices[0].message.content
             
-        await message.answer(response)
+            await message.answer(response + '\nНе является ИИР!!')
 
 
     except TypeError:
